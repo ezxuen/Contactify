@@ -54,6 +54,6 @@ This repository contains the source code, documentation, and assets for the Cont
 ---
 ## License
 This project is licensed under a **Proprietary License**. Only authorized collaborators have access, and all rights are reserved by the owner, Hassan Yahya Alzahrani. For more details, see [LICENSE.md](./LICENSE.md).
----
 
+---
 **© 2025 Hassan Yahya Alzahrani. All Rights Reserved.**
