@@ -30,7 +30,7 @@ This repository contains the source code, documentation, and assets for the Cont
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone <repository_url>
+   git clone https://github.com/ezxuen/Contactify
    ```
 2. Open the project in Android Studio.
 3. Build and run the application on an Android emulator or physical device.
