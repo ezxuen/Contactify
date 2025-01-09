@@ -44,16 +44,16 @@ This repository contains the source code, documentation, and assets for the Cont
 4. By contributing, you agree to assign all intellectual property rights of your contributions to the project owner.
 
 ---
-
-## License
-This project is licensed under a **Proprietary License**. Only authorized collaborators have access, and all rights are reserved by the owner, Hassan Yahya Alzahrani. For more details, see [LICENSE.md](./LICENSE.md).
+## Acknowledgments
+- - **Project Manager / AI/ML Engineer**: Hassan Yahya Alzahrani
+- **UI/UX Designer / Front-End Developer**: Suhayb Medhesh
+- **Database Administrator (DBA) / Data Engineer**: Bassam Kasar
+- **Software Engineers**: Ahmad Firas Alnajjar, Mohammed Alsulaiman
+- **Supervisor**: Dr. Saeed Matar Alshahrani
 
 ---
-
-## Acknowledgments
-- **Team Members**: Bassam Kasar, Ahmad Firas Alnajjar, Mohammed Alsulaiman, Suhayb Medhesh.
-- **Supervisor**: Dr. Saeed Matar Alshahrani.
-
+## License
+This project is licensed under a **Proprietary License**. Only authorized collaborators have access, and all rights are reserved by the owner, Hassan Yahya Alzahrani. For more details, see [LICENSE.md](./LICENSE.md).
 ---
 
 **© 2025 Hassan Yahya Alzahrani. All Rights Reserved.**
