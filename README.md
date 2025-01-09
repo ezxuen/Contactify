@@ -45,7 +45,7 @@ This repository contains the source code, documentation, and assets for the Cont
 
 ---
 ## Acknowledgments
-- - **Project Manager / AI/ML Engineer**: Hassan Yahya Alzahrani
+- **Project Manager / AI/ML Engineer**: Hassan Yahya Alzahrani
 - **UI/UX Designer / Front-End Developer**: Suhayb Medhesh
 - **Database Administrator (DBA) / Data Engineer**: Bassam Kasar
 - **Software Engineers**: Ahmad Firas Alnajjar, Mohammed Alsulaiman
