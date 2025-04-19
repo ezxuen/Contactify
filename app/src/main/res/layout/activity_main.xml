@@ -6,29 +6,30 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@android:color/white"
     tools:context=".MainActivity">
-    <!-- Scrollable Category Grid -->
 
+    <!-- RecyclerView to display industry categories in a scrollable list -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/categoryRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="686dp"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:clipToPadding="false"
+        android:layout_height="match_parent"
         android:padding="16dp"
+        android:clipToPadding="false"
         android:scrollbars="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_category_card" />
 
+    <!-- Floating Action Button (camera/gallery options) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabMain"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_margin="24dp"
         android:src="@android:drawable/ic_input_add"
         android:contentDescription="Add Contact"
-        app:backgroundTint="@color/white" />
+        app:tint="@android:color/white"
+        app:backgroundTint="@color/blue" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

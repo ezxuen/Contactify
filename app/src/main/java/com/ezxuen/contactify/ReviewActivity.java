@@ -1,10 +1,12 @@
-// Top of your file
 package com.ezxuen.contactify;
 
+import android.content.ClipData;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -15,10 +17,16 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.helper.widget.Flow;
 
 import com.ezxuen.contactify.utils.DatabaseHelper;
 import com.google.android.material.chip.Chip;
-import com.google.mlkit.nl.entityextraction.*;
+import com.google.mlkit.nl.entityextraction.Entity;
+import com.google.mlkit.nl.entityextraction.EntityAnnotation;
+import com.google.mlkit.nl.entityextraction.EntityExtraction;
+import com.google.mlkit.nl.entityextraction.EntityExtractionParams;
+import com.google.mlkit.nl.entityextraction.EntityExtractor;
+import com.google.mlkit.nl.entityextraction.EntityExtractorOptions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,7 +43,6 @@ public class ReviewActivity extends AppCompatActivity {
 
     ArrayList<String> unclassifiedData = new ArrayList<>();
     ArrayList<Integer> chipIds = new ArrayList<>();
-    boolean hasLowConfidenceData = true;
 
     HashMap<String, Integer> industryNameToId = new HashMap<>();
     HashMap<Integer, ArrayList<String>> fieldsByIndustry = new HashMap<>();
@@ -68,7 +75,6 @@ public class ReviewActivity extends AppCompatActivity {
         editWebsite = findViewById(R.id.editWebsite);
         industryDropdown = findViewById(R.id.industryDropdown);
         fieldDropdown = findViewById(R.id.fieldDropdown);
-
         unclassifiedContainer = findViewById(R.id.unclassifiedContainer);
         unclassifiedLabel = findViewById(R.id.unclassifiedLabel);
         btnEdit = findViewById(R.id.btnEdit);
@@ -80,115 +86,126 @@ public class ReviewActivity extends AppCompatActivity {
             }
         };
 
-        editName.setOnFocusChangeListener(focusListener);
-        editPhones.setOnFocusChangeListener(focusListener);
-        editEmails.setOnFocusChangeListener(focusListener);
-        editJobTitle.setOnFocusChangeListener(focusListener);
-        editCompany.setOnFocusChangeListener(focusListener);
-        editAddress.setOnFocusChangeListener(focusListener);
-        editWebsite.setOnFocusChangeListener(focusListener);
+        View.OnDragListener dragListener = (v, event) -> {
+            if (event.getAction() == DragEvent.ACTION_DROP && v instanceof EditText) {
+                ClipData.Item item = event.getClipData().getItemAt(0);
+                String droppedText = item.getText().toString();
+                appendToEditText((EditText) v, droppedText);
+
+                View draggedView = (View) event.getLocalState();
+                if (draggedView instanceof Chip) {
+                    ((ViewGroup) draggedView.getParent()).removeView(draggedView);
+                    chipIds.remove((Integer) draggedView.getId());
+                    updateFlowReferencedIds();
+                }
+            }
+            return true;
+        };
+
+        for (EditText field : new EditText[]{editName, editPhones, editEmails, editJobTitle, editCompany, editAddress, editWebsite}) {
+            field.setOnFocusChangeListener(focusListener);
+            field.setOnDragListener(dragListener);
+        }
     }
 
     private void loadIndustryAndFieldData() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         ArrayList<String> industryList = dbHelper.getAllIndustryNames();
+        industryList.add(0, "Select Industry");
+
         industryNameToId = dbHelper.getIndustryNameToIdMap();
         fieldsByIndustry = dbHelper.getFieldsGroupedByIndustry();
 
-        ArrayAdapter<String> industryAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, industryList);
+        fieldDropdown.setEnabled(false);
+
+        ArrayAdapter<String> industryAdapter = new ArrayAdapter<>(this, R.layout.spinner_item_placeholder, industryList);
         industryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         industryDropdown.setAdapter(industryAdapter);
+        industryDropdown.setSelection(0);
 
         industryDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedIndustry = parent.getItemAtPosition(position).toString();
-                Integer industryId = industryNameToId.get(selectedIndustry);
-                if (industryId != null) {
-                    ArrayList<String> fields = fieldsByIndustry.get(industryId);
-                    if (fields != null) {
-                        ArrayAdapter<String> fieldAdapter = new ArrayAdapter<>(ReviewActivity.this, android.R.layout.simple_spinner_item, fields);
-                        fieldAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        fieldDropdown.setAdapter(fieldAdapter);
-                    }
+            @Override public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                if (pos == 0) {
+                    fieldDropdown.setAdapter(null);
+                    fieldDropdown.setEnabled(false);
+                    return;
                 }
+
+                String industry = parent.getItemAtPosition(pos).toString();
+                Integer industryId = industryNameToId.get(industry);
+                if (industryId == null) return;
+
+                ArrayList<String> fields = new ArrayList<>(fieldsByIndustry.get(industryId));
+                fields.add(0, "Select Field");
+
+                fieldDropdown.setEnabled(true);
+                ArrayAdapter<String> fieldAdapter = new ArrayAdapter<>(ReviewActivity.this, R.layout.spinner_item_placeholder, fields);
+                fieldAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                fieldDropdown.setAdapter(fieldAdapter);
+                fieldDropdown.setSelection(0);
             }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
     private void parseAndDisplayFields(String rawText) {
-        EntityExtractorOptions options = new EntityExtractorOptions.Builder(EntityExtractorOptions.ENGLISH).build();
-        EntityExtractor extractor = EntityExtraction.getClient(options);
+        EntityExtractor extractor = EntityExtraction.getClient(
+                new EntityExtractorOptions.Builder(EntityExtractorOptions.ENGLISH).build());
 
-        editEmails.setText("");
-        editPhones.setText("");
-        editAddress.setText("");
-
-        ArrayList<String> alreadyUsedLines = new ArrayList<>();
+        editEmails.setText(""); editPhones.setText(""); editAddress.setText("");
+        ArrayList<String> usedLines = new ArrayList<>();
         unclassifiedData.clear();
 
         extractor.downloadModelIfNeeded()
                 .addOnSuccessListener(unused -> {
                     EntityExtractionParams params = new EntityExtractionParams.Builder(rawText).build();
-                    extractor.annotate(params)
-                            .addOnSuccessListener(annotations -> {
-                                for (EntityAnnotation annotation : annotations) {
-                                    String line = annotation.getAnnotatedText().trim();
-                                    if (alreadyUsedLines.contains(line)) continue;
+                    extractor.annotate(params).addOnSuccessListener(annotations -> {
+                        for (EntityAnnotation annotation : annotations) {
+                            String line = annotation.getAnnotatedText().trim();
+                            if (usedLines.contains(line)) continue;
 
-                                    for (Entity entity : annotation.getEntities()) {
-                                        switch (entity.getType()) {
-                                            case Entity.TYPE_EMAIL:
-                                                appendToEditText(editEmails, line);
-                                                alreadyUsedLines.add(line);
-                                                break;
-                                            case Entity.TYPE_PHONE:
-                                                if (isValidPhone(line) && !looksLikeAddress(line)) {
-                                                    appendToEditText(editPhones, line);
-                                                    alreadyUsedLines.add(line);
-                                                } else {
-                                                    Log.d("MLKit", "❌ Rejected as phone: " + line);
-                                                }
-                                                break;
-                                            case Entity.TYPE_ADDRESS:
-                                                appendToEditText(editAddress, line);
-                                                alreadyUsedLines.add(line);
-                                                break;
+                            for (Entity entity : annotation.getEntities()) {
+                                switch (entity.getType()) {
+                                    case Entity.TYPE_EMAIL:
+                                        appendToEditText(editEmails, line); usedLines.add(line); break;
+                                    case Entity.TYPE_PHONE:
+                                        if (isValidPhone(line) && !looksLikeAddress(line)) {
+                                            appendToEditText(editPhones, line); usedLines.add(line);
                                         }
-                                    }
+                                        break;
+                                    case Entity.TYPE_ADDRESS:
+                                        appendToEditText(editAddress, line); usedLines.add(line); break;
                                 }
+                            }
+                        }
 
-                                for (String line : rawText.split("\n")) {
-                                    String trimmed = line.trim();
-                                    if (!trimmed.isEmpty() && !alreadyUsedLines.contains(trimmed)) {
-                                        unclassifiedData.add(trimmed);
-                                    }
-                                }
+                        for (String line : rawText.split("\n")) {
+                            String trimmed = line.trim();
+                            if (!trimmed.isEmpty() && !usedLines.contains(trimmed)) {
+                                unclassifiedData.add(trimmed);
+                            }
+                        }
 
-                                if (!unclassifiedData.isEmpty()) {
-                                    if (unclassifiedLabel != null) unclassifiedLabel.setVisibility(View.VISIBLE);
-                                    if (unclassifiedContainer != null) {
-                                        unclassifiedContainer.setVisibility(View.VISIBLE);
-                                        for (String item : unclassifiedData) addChip(item);
-                                    }
-                                    setFieldsEditable(true);
-                                } else {
-                                    hasLowConfidenceData = false;
-                                    btnEdit.setVisibility(View.VISIBLE);
-                                    setFieldsEditable(false);
-                                }
-                            })
-                            .addOnFailureListener(e -> Log.e("ReviewActivity", "Entity extraction failed", e));
-                })
-                .addOnFailureListener(e -> Log.e("ReviewActivity", "Model download failed", e));
+                        ViewGroup chipHolder = findViewById(R.id.unclassifiedChipHolder);
+                        chipHolder.removeAllViews();
+                        chipIds.clear();
+
+                        if (!unclassifiedData.isEmpty()) {
+                            unclassifiedLabel.setVisibility(View.VISIBLE);
+                            unclassifiedContainer.setVisibility(View.VISIBLE);
+                            for (String item : unclassifiedData) addChip(item);
+                            setFieldsEditable(true);
+                        } else {
+                            btnEdit.setVisibility(View.VISIBLE);
+                            setFieldsEditable(false);
+                        }
+                    });
+                });
     }
 
     private boolean isValidPhone(String value) {
-        return value.matches("^(\\+?\\d{1,3}[-.\\s]?)?(\\(?\\d{2,4}\\)?[-.\\s]?){2,4}\\d{3,6}$")
-                && !value.matches(".*[a-zA-Z].*");
+        return value.matches("^(\\+?\\d{1,3}[-.\\s]?)?(\\(?\\d{2,4}\\)?[-.\\s]?){2,4}\\d{3,6}$") && !value.matches(".*[a-zA-Z].*");
     }
 
     private boolean looksLikeAddress(String value) {
@@ -199,39 +216,60 @@ public class ReviewActivity extends AppCompatActivity {
 
     private void appendToEditText(EditText editText, String value) {
         String current = editText.getText().toString();
-        if (!TextUtils.isEmpty(current)) {
-            current += ", ";
-        }
+        if (!TextUtils.isEmpty(current)) current += ", ";
         editText.setText(current + value);
     }
 
     private void addChip(String text) {
-        if (unclassifiedContainer == null) return;
         Chip chip = new Chip(this);
         chip.setText(text);
         chip.setClickable(true);
         chip.setCheckable(false);
         chip.setId(View.generateViewId());
         chip.setChipBackgroundColorResource(android.R.color.darker_gray);
+
+        // Margin around chip
+        ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        int dp8 = (int) (8 * getResources().getDisplayMetrics().density);
+        params.setMargins(dp8, dp8, dp8, dp8);
+        chip.setLayoutParams(params);
+
+        chip.setOnLongClickListener(v -> {
+            ClipData data = ClipData.newPlainText("label", chip.getText());
+            View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(chip);
+            v.startDragAndDrop(data, shadowBuilder, chip, 0);
+            return true;
+        });
+
         chip.setOnClickListener(v -> {
             if (selectedTargetField != null) {
                 appendToEditText(selectedTargetField, text);
-                unclassifiedContainer.removeView(chip);
+                ((ViewGroup) chip.getParent()).removeView(chip);
                 chipIds.remove((Integer) chip.getId());
                 updateFlowReferencedIds();
             }
         });
-        unclassifiedContainer.addView(chip);
+
+        ViewGroup chipHolder = findViewById(R.id.unclassifiedChipHolder);
+        chipHolder.setVisibility(View.VISIBLE);
+        chipHolder.addView(chip);
         chipIds.add(chip.getId());
         updateFlowReferencedIds();
     }
 
     private void updateFlowReferencedIds() {
-        if (unclassifiedContainer != null) {
-            androidx.constraintlayout.helper.widget.Flow flow = unclassifiedContainer.findViewById(R.id.unclassifiedFlow);
-            if (flow != null) {
-                flow.setReferencedIds(chipIds.stream().mapToInt(Integer::intValue).toArray());
+        Flow flow = findViewById(R.id.unclassifiedFlow);
+        ViewGroup chipHolder = findViewById(R.id.unclassifiedChipHolder);
+        if (flow != null && chipHolder != null) {
+            int count = chipHolder.getChildCount();
+            int[] ids = new int[count];
+            for (int i = 0; i < count; i++) {
+                ids[i] = chipHolder.getChildAt(i).getId();
             }
+            flow.setReferencedIds(ids);
         }
     }
 
@@ -276,8 +314,8 @@ public class ReviewActivity extends AppCompatActivity {
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.insertContact(name, phones, emails, job, company, address, website, industryId, fieldId);
-
         Toast.makeText(this, "Contact saved!", Toast.LENGTH_SHORT).show();
         finish();
     }
+
 }

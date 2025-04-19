@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -27,6 +28,7 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -141,8 +143,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadContacts(String field) {
         currentLevel = Level.CONTACT;
-        ArrayList<String> contacts = dbHelper.getContactsByField(field);
-        categoryRecyclerView.setAdapter(new ContactAdapter(contacts));
+
+        LinkedHashMap<String, ArrayList<Pair<Integer, String>>> groupedContacts =
+                dbHelper.getGroupedContactsByField(field);
+
+        categoryRecyclerView.setAdapter(new GroupedContactAdapter(groupedContacts));
     }
 
     @Override

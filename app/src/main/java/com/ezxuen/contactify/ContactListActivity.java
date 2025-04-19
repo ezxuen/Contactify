@@ -2,41 +2,64 @@ package com.ezxuen.contactify;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ezxuen.contactify.utils.DatabaseHelper;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class ContactListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private ContactAdapter adapter;
-    private String fieldName;
+    private GroupedContactAdapter adapter;
     private DatabaseHelper dbHelper;
+    private String fieldName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
 
-        recyclerView = findViewById(R.id.contactRecyclerView);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+        // Get selected field
+        fieldName = getIntent().getStringExtra("field_name");
+
+        if (fieldName == null) {
+            Log.e("ContactListActivity", "Missing field_name intent extra");
+            finish();
+            return;
+        }
+
+        // Set toolbar title dynamically
+        getSupportActionBar().setTitle(fieldName);
+
+        // Recycler setup
+        RecyclerView recyclerView = findViewById(R.id.contactRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dbHelper = new DatabaseHelper(this);
 
-        fieldName = getIntent().getStringExtra("field_name");
+        LinkedHashMap<String, ArrayList<Pair<Integer, String>>> groupedData =
+                dbHelper.getGroupedContactsByField(fieldName);
+        adapter = new GroupedContactAdapter(groupedData);
+        recyclerView.setAdapter(adapter);
+    }
 
-        if (fieldName != null) {
-            Log.d("ContactListActivity", "Field: " + fieldName);
-            ArrayList<String> contacts = dbHelper.getContactsByField(fieldName);
-            adapter = new ContactAdapter(contacts);
-            recyclerView.setAdapter(adapter);
-        } else {
-            Log.e("ContactListActivity", "Missing field_name intent extra");
-            finish();
-        }
+    // Handle back button
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 }
