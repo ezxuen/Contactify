@@ -1,323 +1,333 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:fillViewport="true">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/unclassifiedContainer"
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:fillViewport="true">
 
-        <!-- NAME -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true"
-            app:cardPreventCornerOverlap="false"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <EditText
-                android:id="@+id/editName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Full Name"
-                android:padding="12dp"
-                android:background="@android:color/white"
-                android:textColor="@color/black"
-                android:textColorHint="@android:color/darker_gray"/>
-        </androidx.cardview.widget.CardView>
-
-        <!-- PHONE -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardPhones"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/cardName"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true"
-            app:cardPreventCornerOverlap="false">
-
-            <EditText
-                android:id="@+id/editPhones"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Phone Numbers"
-                android:padding="12dp"
-                android:background="@android:color/white"
-                android:textColor="@color/black"
-                android:textColorHint="@android:color/darker_gray"/>
-        </androidx.cardview.widget.CardView>
-
-        <!-- EMAIL -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardEmails"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/cardPhones"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true"
-            app:cardPreventCornerOverlap="false">
-
-            <EditText
-                android:id="@+id/editEmails"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Emails"
-                android:padding="12dp"
-                android:background="@android:color/white"
-                android:textColor="@color/black"
-                android:textColorHint="@android:color/darker_gray"/>
-        </androidx.cardview.widget.CardView>
-
-        <!-- JOB TITLE -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardJobTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/cardEmails"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true"
-            app:cardPreventCornerOverlap="false">
-
-            <EditText
-                android:id="@+id/editJobTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Job Title"
-                android:padding="12dp"
-                android:background="@android:color/white"
-                android:textColor="@color/black"
-                android:textColorHint="@android:color/darker_gray"/>
-        </androidx.cardview.widget.CardView>
-
-        <!-- COMPANY -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardCompany"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/cardJobTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true"
-            app:cardPreventCornerOverlap="false">
-
-            <EditText
-                android:id="@+id/editCompany"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Company"
-                android:padding="12dp"
-                android:background="@android:color/white"
-                android:textColor="@color/black"
-                android:textColorHint="@android:color/darker_gray"/>
-        </androidx.cardview.widget.CardView>
-
-        <!-- ADDRESS -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardAddress"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/cardCompany"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true"
-            app:cardPreventCornerOverlap="false">
-
-            <EditText
-                android:id="@+id/editAddress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Address"
-                android:padding="12dp"
-                android:background="@android:color/white"
-                android:textColor="@color/black"
-                android:textColorHint="@android:color/darker_gray"/>
-        </androidx.cardview.widget.CardView>
-
-        <!-- WEBSITE -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardWebsite"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/cardAddress"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true"
-            app:cardPreventCornerOverlap="false">
-
-            <EditText
-                android:id="@+id/editWebsite"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Website"
-                android:inputType="textUri"
-                android:padding="12dp"
-                android:background="@android:color/white"
-                android:textColor="@color/black"
-                android:textColorHint="@android:color/darker_gray"/>
-        </androidx.cardview.widget.CardView>
-
-        <!-- INDUSTRY -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardIndustry"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/cardWebsite"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true"
-            app:cardPreventCornerOverlap="false">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@android:color/white">
-
-                <Spinner
-                    android:id="@+id/industryDropdown"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    style="@style/AppSpinnerWhiteDropdown"
-                    android:spinnerMode="dropdown"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- FIELD -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardField"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/cardIndustry"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardUseCompatPadding="true"
-            app:cardPreventCornerOverlap="false">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@android:color/white">
-
-                <Spinner
-                    android:id="@+id/fieldDropdown"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    style="@style/AppSpinnerWhiteDropdown"
-                    android:spinnerMode="dropdown"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- UNCLASSIFIED LABEL -->
-        <TextView
-            android:id="@+id/unclassifiedLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Unclassified Data"
-            android:textColor="@android:color/black"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/cardField"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-        <!-- CHIP CONTAINER -->
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/unclassifiedChipHolder"
-            android:layout_width="0dp"
+            android:id="@+id/unclassifiedContainer"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="64dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            app:layout_constraintTop_toBottomOf="@id/unclassifiedLabel"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:padding="8dp">
 
-            <androidx.constraintlayout.helper.widget.Flow
-                android:id="@+id/unclassifiedFlow"
-                android:layout_width="match_parent"
+            <!-- NAME -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardName"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:flow_wrapMode="aligned"
-                app:flow_horizontalGap="12dp"
-                app:flow_verticalGap="12dp"
-                app:flow_maxElementsWrap="4"
-                app:flow_horizontalAlign="start"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="false"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <EditText
+                    android:id="@+id/editName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Full Name"
+                    android:padding="12dp"
+                    android:background="@android:color/white"
+                    android:textColor="@color/black"
+                    android:textColorHint="@android:color/darker_gray"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- PHONE -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardPhones"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/cardName"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="false">
+
+                <EditText
+                    android:id="@+id/editPhones"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Phone Numbers"
+                    android:padding="12dp"
+                    android:background="@android:color/white"
+                    android:textColor="@color/black"
+                    android:textColorHint="@android:color/darker_gray"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- EMAIL -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardEmails"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/cardPhones"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="false">
+
+                <EditText
+                    android:id="@+id/editEmails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Emails"
+                    android:padding="12dp"
+                    android:background="@android:color/white"
+                    android:textColor="@color/black"
+                    android:textColorHint="@android:color/darker_gray"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- JOB TITLE -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardJobTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/cardEmails"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="false">
+
+                <EditText
+                    android:id="@+id/editJobTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Job Title"
+                    android:padding="12dp"
+                    android:background="@android:color/white"
+                    android:textColor="@color/black"
+                    android:textColorHint="@android:color/darker_gray"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- COMPANY -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardCompany"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/cardJobTitle"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="false">
+
+                <EditText
+                    android:id="@+id/editCompany"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Company"
+                    android:padding="12dp"
+                    android:background="@android:color/white"
+                    android:textColor="@color/black"
+                    android:textColorHint="@android:color/darker_gray"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ADDRESS -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardAddress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/cardCompany"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="false">
+
+                <EditText
+                    android:id="@+id/editAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Address"
+                    android:padding="12dp"
+                    android:background="@android:color/white"
+                    android:textColor="@color/black"
+                    android:textColorHint="@android:color/darker_gray"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- WEBSITE -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardWebsite"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/cardAddress"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="false">
+
+                <EditText
+                    android:id="@+id/editWebsite"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Website"
+                    android:inputType="textUri"
+                    android:padding="12dp"
+                    android:background="@android:color/white"
+                    android:textColor="@color/black"
+                    android:textColorHint="@android:color/darker_gray"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- INDUSTRY -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardIndustry"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/cardWebsite"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="false">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@android:color/white">
+
+                    <Spinner
+                        android:id="@+id/industryDropdown"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/AppSpinnerWhiteDropdown"
+                        android:spinnerMode="dropdown"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- FIELD -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardField"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:layout_constraintTop_toBottomOf="@id/cardIndustry"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true"
+                app:cardPreventCornerOverlap="false">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@android:color/white">
+
+                    <Spinner
+                        android:id="@+id/fieldDropdown"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/AppSpinnerWhiteDropdown"
+                        android:spinnerMode="dropdown"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- UNCLASSIFIED LABEL -->
+            <TextView
+                android:id="@+id/unclassifiedLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Unclassified Data"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/cardField"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/chipContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/unclassifiedLabel"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:padding="16dp">
+
+                <androidx.constraintlayout.helper.widget.Flow
+                    android:id="@+id/unclassifiedFlow"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:flow_wrapMode="aligned"
+                    app:flow_horizontalGap="12dp"
+                    app:flow_verticalGap="12dp"
+                    app:flow_maxElementsWrap="4"
+                    app:flow_horizontalAlign="start" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+            <!-- ACTION BUTTONS -->
+            <LinearLayout
+                android:id="@+id/buttonLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                app:layout_constraintTop_toBottomOf="@id/chipContainer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <Button
+                    android:id="@+id/btnSave"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Save"
+                    android:textColor="@android:color/white"
+                    app:backgroundTint="@color/blue"
+                    android:layout_marginEnd="8dp"/>
+
+                <Button
+                    android:id="@+id/btnEdit"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Edit"
+                    android:textColor="@android:color/white"
+                    app:backgroundTint="@color/blue"
+                    android:visibility="visible"
+                    android:layout_marginStart="8dp"/>
+                <Button
+                    android:id="@+id/btnDelete"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Delete"
+                    android:textColor="@android:color/white"
+                    app:backgroundTint="@color/red"
+                    android:visibility="gone"
+                    android:layout_marginStart="8dp"/>
+            </LinearLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!-- ACTION BUTTONS -->
-        <LinearLayout
-            android:id="@+id/buttonLayout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:orientation="horizontal"
-            android:gravity="center"
-            app:layout_constraintTop_toBottomOf="@id/unclassifiedChipHolder"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <Button
-                android:id="@+id/btnSave"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Save"
-                android:textColor="@android:color/white"
-                app:backgroundTint="@color/blue"
-                android:layout_marginEnd="8dp"/>
-
-            <Button
-                android:id="@+id/btnEdit"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:text="Edit"
-                android:textColor="@android:color/white"
-                app:backgroundTint="@color/blue"
-                android:layout_marginStart="8dp"/>
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+    </ScrollView>

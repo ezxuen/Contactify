@@ -199,5 +199,51 @@
             cursor.close();
             return result;
         }
+        public Cursor getContactById(int contactId) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            return db.rawQuery("SELECT * FROM contacts WHERE contact_id = ?", new String[]{String.valueOf(contactId)});
+        }
+
+        public String getIndustryNameById(int id) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor c = db.rawQuery("SELECT industry_name FROM industries WHERE industry_id = ?", new String[]{String.valueOf(id)});
+            if (c.moveToFirst()) {
+                String name = c.getString(0);
+                c.close();
+                return name;
+            }
+            c.close();
+            return null;
+        }
+
+        public String getFieldNameById(int id) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor c = db.rawQuery("SELECT field_name FROM fields WHERE field_id = ?\n", new String[]{String.valueOf(id)});
+            if (c.moveToFirst()) {
+                String name = c.getString(0);
+                c.close();
+                return name;
+            }
+            c.close();
+            return null;
+        }
+        public void updateContact(int contactId, String name, String phone, String email, String job,
+                                  String company, String address, String website,
+                                  int industryId, int fieldId) {
+
+            SQLiteDatabase db = getWritableDatabase();
+            db.execSQL("UPDATE contacts SET " +
+                            "name = ?, phone = ?, email = ?, job_title = ?, company = ?, " +
+                            "address = ?, website = ?, industry_id = ?, field_id = ? " +
+                            "WHERE contact_id = ?",
+                    new Object[]{
+                            name, phone, email, job, company, address, website,
+                            industryId, fieldId, contactId
+                    });
+        }
+        public void deleteContact(int contactId) {
+            SQLiteDatabase db = getWritableDatabase();
+            db.execSQL("DELETE FROM contacts WHERE contact_id = ?", new Object[]{contactId});
+        }
 
     }

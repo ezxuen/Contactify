@@ -1,5 +1,6 @@
 package com.ezxuen.contactify;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
@@ -46,13 +47,19 @@ public class ContactListActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(fieldName);
 
         // Recycler setup
-        RecyclerView recyclerView = findViewById(R.id.contactRecyclerView);
+        recyclerView = findViewById(R.id.contactRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dbHelper = new DatabaseHelper(this);
 
         LinkedHashMap<String, ArrayList<Pair<Integer, String>>> groupedData =
                 dbHelper.getGroupedContactsByField(fieldName);
-        adapter = new GroupedContactAdapter(groupedData);
+
+        adapter = new GroupedContactAdapter(groupedData, contactId -> {
+            Intent intent = new Intent(ContactListActivity.this, ReviewActivity.class);
+            intent.putExtra("contact_id", contactId);
+            startActivity(intent);
+        });
+
         recyclerView.setAdapter(adapter);
     }
 

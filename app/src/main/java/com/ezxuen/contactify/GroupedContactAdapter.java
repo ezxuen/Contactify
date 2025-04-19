@@ -19,10 +19,17 @@ public class GroupedContactAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
 
-    private final List<Object> displayList; // Contains both Strings (headers) and Pairs (contact ID, name)
+    private final List<Object> displayList;
+    private final OnContactClickListener contactClickListener;
 
-    public GroupedContactAdapter(LinkedHashMap<String, ArrayList<Pair<Integer, String>>> groupedData) {
+    public interface OnContactClickListener {
+        void onContactClick(int contactId);
+    }
+
+    public GroupedContactAdapter(LinkedHashMap<String, ArrayList<Pair<Integer, String>>> groupedData,
+                                 OnContactClickListener listener) {
         displayList = new ArrayList<>();
+        contactClickListener = listener;
 
         for (Map.Entry<String, ArrayList<Pair<Integer, String>>> entry : groupedData.entrySet()) {
             String jobTitle = entry.getKey();
@@ -60,6 +67,12 @@ public class GroupedContactAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         } else {
             Pair<Integer, String> contact = (Pair<Integer, String>) displayList.get(position);
             ((ContactViewHolder) holder).nameText.setText(contact.second);
+
+            holder.itemView.setOnClickListener(v -> {
+                if (contactClickListener != null) {
+                    contactClickListener.onContactClick(contact.first);
+                }
+            });
         }
     }
 

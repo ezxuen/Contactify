@@ -9,8 +9,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private FloatingActionButton fabMain;
     private RecyclerView categoryRecyclerView;
+    private TextView headerText;
+    private ImageView backArrow;
     private Uri imageUri;
 
     private enum Level { INDUSTRY, FIELD, CONTACT }
@@ -94,7 +100,11 @@ public class MainActivity extends AppCompatActivity {
         dbHelper = new DatabaseHelper(this);
         fabMain = findViewById(R.id.fabMain);
         categoryRecyclerView = findViewById(R.id.categoryRecyclerView);
+        headerText = findViewById(R.id.headerText);
+        backArrow = findViewById(R.id.backArrow);
+
         categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        backArrow.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
         if (!hasIndustries()) {
             Log.d(TAG, "Industries not found. Loading from Excel...");
@@ -104,6 +114,31 @@ public class MainActivity extends AppCompatActivity {
         loadIndustries();
 
         fabMain.setOnClickListener(view -> openImagePicker());
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (currentLevel == Level.CONTACT) {
+                    loadFields(selectedIndustry);
+                } else if (currentLevel == Level.FIELD) {
+                    loadIndustries();
+                } else {
+                    finish();
+                }
+            }
+        });
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (currentLevel == Level.INDUSTRY) {
+            loadIndustries();
+        } else if (currentLevel == Level.FIELD && selectedIndustry != null) {
+            loadFields(selectedIndustry);
+        } else if (currentLevel == Level.CONTACT && selectedField != null) {
+            loadContacts(selectedField);
+        }
     }
 
     private boolean hasIndustries() {
@@ -125,6 +160,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadIndustries() {
         currentLevel = Level.INDUSTRY;
+        headerText.setText("Industries");
+        backArrow.setVisibility(View.GONE);
+
         ArrayList<String> industries = dbHelper.getIndustriesWithContacts();
         categoryRecyclerView.setAdapter(new IndustryAdapter(industries, industry -> {
             selectedIndustry = industry;
@@ -134,6 +172,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadFields(String industry) {
         currentLevel = Level.FIELD;
+        headerText.setText(industry);
+        backArrow.setVisibility(View.VISIBLE);
+
         ArrayList<String> fields = dbHelper.getFieldsWithContacts(industry);
         categoryRecyclerView.setAdapter(new FieldAdapter(fields, field -> {
             selectedField = field;
@@ -143,21 +184,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadContacts(String field) {
         currentLevel = Level.CONTACT;
+        headerText.setText(field);
+        backArrow.setVisibility(View.VISIBLE);
 
         LinkedHashMap<String, ArrayList<Pair<Integer, String>>> groupedContacts =
                 dbHelper.getGroupedContactsByField(field);
 
-        categoryRecyclerView.setAdapter(new GroupedContactAdapter(groupedContacts));
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (currentLevel == Level.CONTACT) {
-            loadFields(selectedIndustry);
-        } else if (currentLevel == Level.FIELD) {
-            loadIndustries();
-        } else {
-            super.onBackPressed();
-        }
+        categoryRecyclerView.setAdapter(new GroupedContactAdapter(groupedContacts, contactId -> {
+            Intent intent = new Intent(MainActivity.this, ReviewActivity.class);
+            intent.putExtra("contact_id", contactId);
+            startActivity(intent);
+        }));
     }
 }
