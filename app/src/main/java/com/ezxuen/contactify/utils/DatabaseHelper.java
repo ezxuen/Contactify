@@ -179,6 +179,7 @@
                     new String[]{fieldName}
             );
 
+
             int count = 0;
             while (cursor.moveToNext()) {
                 int id = cursor.getInt(0);
