@@ -1,50 +1,63 @@
-# Contactify
+# 💇 Contactify
+Business Card Scanning and Management Application
 
-**Business Card Management Application**
-
-Contactify is an innovative mobile application designed to digitize, organize, and manage business cards efficiently. By leveraging cutting-edge Optical Character Recognition (OCR) and AI capabilities, the app provides offline functionality and multilingual support for professionals worldwide.
-
----
-
-## Features
-- **On-Device OCR**: Digitize business cards without requiring an internet connection.
-- **Multilingual Support**: Extract and manage contact details in multiple languages.
-- **Contact Categorization**: Automatically sort contacts into categories like job title or industry.
-- **Offline Functionality**: Ensure privacy and usability anywhere, even without connectivity.
-- **User-Friendly Design**: Simplified interface for seamless user experience.
+**Contactify** is a mobile app that digitizes business cards using **on-device OCR** and **AI-powered categorization**, offering secure, offline-first contact management with multilingual support.
 
 ---
 
-## Repository Overview
-This repository contains the source code, documentation, and assets for the Contactify application. Access is restricted to authorized collaborators contributing to the development and refinement of the project.
+## ✨ Features
+- **On-Device OCR**: Scan and extract business card data without internet (ML Kit based).
+- **Structured Contact Fields**: Auto-fill names, phone numbers, emails, job titles, companies, websites, and addresses.
+- **Industry and Field Categorization**: Organize contacts hierarchically: *Industry ➔ Field ➔ Contact*.
+- **Offline Functionality**: No cloud storage needed; complete privacy.
+- **User-Friendly Interface**: Designed with Figma prototypes, built using Android Studio and Java.
+- **Free and Accessible**: No subscriptions or hidden fees.
+- **Manual & Future Auto-Categorization**: Currently manual; automatic categorization planned in future updates.
 
 ---
 
-## Getting Started
+## 🏗 App Structure
+- `MainActivity`: Start page to select camera/gallery.
+- `ReviewActivity`: Review and edit scanned contact fields.
+- `DatabaseHelper`: SQLite DB handler for contacts, industries, and fields.
+- `IndustryFieldHelper`: Load industry/field data from assets.
+- `ContactListActivity`: Display saved contacts categorized under industry/field.
+- `EntityExtractionHelper`: Extract structured fields (email, phone, address, etc.) from scanned text.
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- **Development Environment**: Android Studio (latest version recommended).
-- **Programming Language**: Java.
-- **Dependencies**: ML Kit (OCR), SQLite.
+- Android Studio (latest version)
+- Java (8 or higher)
+- ML Kit dependency
+- Gradle build system
 
 ### Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/ezxuen/Contactify
-   ```
-2. Open the project in Android Studio.
-3. Build and run the application on an Android emulator or physical device.
+```bash
+git clone https://github.com/ezxuen/Contactify
+cd Contactify
+```
+- Open the project in **Android Studio**.
+- Sync Gradle.
+- Run on emulator or Android device.
 
 ---
 
-## Contribution Guidelines
-1. Fork the repository and create a new branch for your feature or bug fix.
-2. Ensure your code adheres to the project's coding standards.
-3. Submit a pull request with a clear description of your changes.
-4. By contributing, you agree to assign all intellectual property rights of your contributions to the project owner.
+## 📋 Changes & Future Enhancements
+- ➡ **Moved Automatic Categorization** to future releases.
+- ➡ **Completed Industry/Field database integration** (Excel-based).
+- ➡ **Enhanced manual review/edit flow** before saving contacts.
+
+Future Plans:
+- **Automatic industry and field suggestion** based on job title/company name.
+- **Optional cloud backup (with user consent)**.
+- **iOS Version**.
 
 ---
-## Acknowledgments
+
+## 🧑‍💻 Contributors
 - Hassan Yahya Alzahrani
 - Suhayb Medhesh
 - Bassam Kasar
@@ -52,11 +65,10 @@ This repository contains the source code, documentation, and assets for the Cont
 - Mohammed Alsulaiman
 - Ali Hussain Alfilfil
 
-- **Supervisor**: Dr. Saeed Matar Alshahrani
+**Supervisor**: Dr. Saeed Matar Alshahrani
 
 ---
-## License
-This project is licensed under a **Proprietary License**. Only authorized collaborators have access, and all rights are reserved by the owner, Hassan Yahya Alzahrani. For more details, see [LICENSE.md](./LICENSE.md).
 
----
-**© 2025 Hassan Yahya Alzahrani. All Rights Reserved.**
+## 🔒 License
+This project is licensed under a **Proprietary License**.  
+© 2025 Hassan Yahya Alzahrani. All rights reserved.
