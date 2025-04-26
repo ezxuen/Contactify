@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         categoryRecyclerView = findViewById(R.id.categoryRecyclerView);
         headerText = findViewById(R.id.headerText);
         backArrow = findViewById(R.id.backArrow);
-        dbHelper.insertExample5Industries(); // remove
+        //dbHelper.insertExample5Industries(); // remove
         categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         backArrow.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
