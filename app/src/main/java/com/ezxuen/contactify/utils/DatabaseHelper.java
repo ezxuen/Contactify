@@ -245,14 +245,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void insertExample5Industries() {
         SQLiteDatabase db = getWritableDatabase();
 
-        // STEP 1: Insert Industries
+
         db.execSQL("INSERT INTO industries (industry_id, industry_name) VALUES (1, 'Information Technology')");
         db.execSQL("INSERT INTO industries (industry_id, industry_name) VALUES (2, 'Healthcare')");
         db.execSQL("INSERT INTO industries (industry_id, industry_name) VALUES (3, 'Education')");
         db.execSQL("INSERT INTO industries (industry_id, industry_name) VALUES (4, 'Finance')");
         db.execSQL("INSERT INTO industries (industry_id, industry_name) VALUES (5, 'Construction')");
 
-        // STEP 2: Insert Fields
         db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (1, 'Software Development', 1)");
         db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (2, 'Cybersecurity', 1)");
         db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (3, 'Nursing', 2)");
@@ -263,8 +262,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (8, 'Investment Banking', 4)");
         db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (9, 'Civil Engineering', 5)");
         db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (10, 'Architecture', 5)");
-
-        // STEP 3: Insert Contacts (2–3 contacts per field)
 
         // Information Technology
         insertContact("John Doe", "+1111111111", "john.doe@techsolutions.com", "Software Developer", "Tech Solutions", "123 Tech Street", "www.techsolutions.com", 1, 1);
