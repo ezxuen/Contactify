@@ -21,7 +21,7 @@ public class ExcelLoader {
             Workbook workbook = new XSSFWorkbook(inputStream);
 
             // Load industries
-            Sheet industriesSheet = workbook.getSheetAt(0); // Assuming first sheet = industries
+            Sheet industriesSheet = workbook.getSheetAt(0);
             for (Row row : industriesSheet) {
                 if (row.getRowNum() == 0) continue; // skip header
                 int industryId = (int) row.getCell(0).getNumericCellValue();
@@ -34,9 +34,9 @@ public class ExcelLoader {
             }
 
             // Load fields
-            Sheet fieldsSheet = workbook.getSheetAt(1); // Assuming second sheet = fields
+            Sheet fieldsSheet = workbook.getSheetAt(1);
             for (Row row : fieldsSheet) {
-                if (row.getRowNum() == 0) continue; // skip header
+                if (row.getRowNum() == 0) continue;
                 int fieldId = (int) row.getCell(0).getNumericCellValue();
                 String fieldName = row.getCell(1).getStringCellValue();
                 int industryId = (int) row.getCell(2).getNumericCellValue();

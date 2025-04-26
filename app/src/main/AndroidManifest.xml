@@ -3,11 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.ezxuen.contactify">
 
-    <!-- Required permissions -->
+    <!-- Camera permission -->
     <uses-permission android:name="android.permission.CAMERA"
         tools:ignore="PermissionImpliesUnsupportedChromeOsHardware" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <!-- Storage permissions (use READ_MEDIA_IMAGES for API 33+) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!-- Include READ_EXTERNAL_STORAGE only if targeting older devices -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <application
         android:allowBackup="true"
@@ -19,6 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Contactify"
         tools:targetApi="31">
+
         <activity android:name=".ReviewActivity" />
 
         <!-- FileProvider for camera image capture -->
@@ -41,5 +46,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>

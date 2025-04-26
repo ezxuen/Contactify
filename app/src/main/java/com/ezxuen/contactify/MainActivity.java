@@ -17,12 +17,14 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ezxuen.contactify.utils.DatabaseHelper;
 import com.ezxuen.contactify.utils.ExcelLoader;
+import com.ezxuen.contactify.utils.OcrCaptureHandler;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.TextRecognition;
@@ -50,7 +52,15 @@ public class MainActivity extends AppCompatActivity {
     private String selectedField = null;
 
     private DatabaseHelper dbHelper;
+    private final ActivityResultLauncher<String[]> permissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                boolean cameraGranted = Boolean.TRUE.equals(result.getOrDefault(android.Manifest.permission.CAMERA, false));
+                boolean readGranted = Boolean.TRUE.equals(result.getOrDefault(android.Manifest.permission.READ_EXTERNAL_STORAGE, false));
 
+                if (cameraGranted && readGranted) {
+                    showImageSourceDialog();
+                }
+            });
     private final ActivityResultLauncher<Intent> pickImageLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
@@ -103,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         categoryRecyclerView = findViewById(R.id.categoryRecyclerView);
         headerText = findViewById(R.id.headerText);
         backArrow = findViewById(R.id.backArrow);
-
+        dbHelper.insertExample5Industries();
         categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         backArrow.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
@@ -114,7 +124,12 @@ public class MainActivity extends AppCompatActivity {
 
         loadIndustries();
 
-        fabMain.setOnClickListener(view -> openImagePicker());
+        fabMain.setOnClickListener(view -> {
+            showImageSourceDialog();
+            requestPermissionsAndShowDialog();
+        });
+
+
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -129,6 +144,57 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    private void requestPermissionsAndShowDialog() {
+        boolean cameraGranted = checkSelfPermission(android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED;
+        boolean readGranted = checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == android.content.pm.PackageManager.PERMISSION_GRANTED;
+
+        if (cameraGranted && readGranted) {
+            showImageSourceDialog();
+        } else {
+            String[] permissions = {
+                    android.Manifest.permission.CAMERA,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE
+            };
+            permissionLauncher.launch(permissions);
+        }
+    }
+    private void showImageSourceDialog() {
+        String[] options = {"Camera", "Gallery"};
+
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Select Source")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        openCamera();
+                    } else if (which == 1) {
+                        openGallery();
+                    }
+                })
+                .show();
+    }
+    private void openGallery() {
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickImageLauncher.launch(intent);
+    }
+    private void openCamera() {
+        OcrCaptureHandler.startCameraCapture(this);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        OcrCaptureHandler.handleResult(this, requestCode, resultCode, data, rawText -> {
+            if (rawText != null && !rawText.trim().isEmpty()) {
+                Intent intent = new Intent(MainActivity.this, ReviewActivity.class);
+                intent.putExtra("ocr_result", rawText);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "No text recognized.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
     @Override
     protected void onResume() {
         super.onResume();

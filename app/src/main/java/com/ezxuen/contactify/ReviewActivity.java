@@ -177,7 +177,6 @@ public class ReviewActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 if (pos == 0) {
-                    // If user selects "Select Industry", disable fieldDropdown
                     fieldDropdown.setAdapter(null);
                     fieldDropdown.setEnabled(false);
                 } else {
@@ -194,7 +193,7 @@ public class ReviewActivity extends AppCompatActivity {
                     fieldDropdown.setSelection(0);
                     fieldDropdown.setEnabled(true);
                 }
-                validateSaveButton(); // ✅ Always validate after changing industry
+                validateSaveButton();
             }
 
             @Override
@@ -206,7 +205,7 @@ public class ReviewActivity extends AppCompatActivity {
         fieldDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                validateSaveButton(); // ✅ Always validate after changing field
+                validateSaveButton();
             }
 
             @Override
@@ -215,10 +214,6 @@ public class ReviewActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
-
 
     private void parseAndDisplayFields(String rawText) {
         EntityExtractor extractor = EntityExtraction.getClient(

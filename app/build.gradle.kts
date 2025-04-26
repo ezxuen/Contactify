@@ -46,10 +46,11 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.text.recognition)
-    implementation(libs.entity.extraction) 
+    implementation(libs.entity.extraction)
     implementation(libs.poi)
     implementation(libs.poi.ooxml)
     implementation(libs.material.v1110)
     implementation(libs.flexbox)
+    implementation(libs.appintro)
 
 }

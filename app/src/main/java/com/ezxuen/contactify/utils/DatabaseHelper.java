@@ -242,5 +242,63 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL("DELETE FROM contacts WHERE contact_id = ?", new Object[]{contactId});
     }
+    public void insertExample5Industries() {
+        SQLiteDatabase db = getWritableDatabase();
 
+        // STEP 1: Insert Industries
+        db.execSQL("INSERT INTO industries (industry_id, industry_name) VALUES (1, 'Information Technology')");
+        db.execSQL("INSERT INTO industries (industry_id, industry_name) VALUES (2, 'Healthcare')");
+        db.execSQL("INSERT INTO industries (industry_id, industry_name) VALUES (3, 'Education')");
+        db.execSQL("INSERT INTO industries (industry_id, industry_name) VALUES (4, 'Finance')");
+        db.execSQL("INSERT INTO industries (industry_id, industry_name) VALUES (5, 'Construction')");
+
+        // STEP 2: Insert Fields
+        db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (1, 'Software Development', 1)");
+        db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (2, 'Cybersecurity', 1)");
+        db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (3, 'Nursing', 2)");
+        db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (4, 'Pharmacy', 2)");
+        db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (5, 'Primary Teaching', 3)");
+        db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (6, 'University Lecturing', 3)");
+        db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (7, 'Accounting', 4)");
+        db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (8, 'Investment Banking', 4)");
+        db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (9, 'Civil Engineering', 5)");
+        db.execSQL("INSERT INTO fields (field_id, field_name, industry_id) VALUES (10, 'Architecture', 5)");
+
+        // STEP 3: Insert Contacts (2–3 contacts per field)
+
+        // Information Technology
+        insertContact("John Doe", "+1111111111", "john.doe@techsolutions.com", "Software Developer", "Tech Solutions", "123 Tech Street", "www.techsolutions.com", 1, 1);
+        insertContact("Jane Smith", "+1111111112", "jane.smith@techsolutions.com", "Software Developer", "Tech Solutions", "123 Tech Street", "www.techsolutions.com", 1, 1);
+
+        insertContact("Alice Carter", "+1111111123", "alice.carter@cybershield.com", "Cybersecurity Specialist", "CyberShield", "456 Secure Avenue", "www.cybershield.com", 1, 2);
+        insertContact("Bob Knight", "+1111111124", "bob.knight@cybershield.com", "Cybersecurity Specialist", "CyberShield", "456 Secure Avenue", "www.cybershield.com", 1, 2);
+
+        // Healthcare
+        insertContact("Emily Johnson", "+2222222221", "emily.johnson@cityhospital.org", "Nurse", "City Hospital", "789 Health Blvd", "www.cityhospital.org", 2, 3);
+        insertContact("Michael Brown", "+2222222222", "michael.brown@cityhospital.org", "Nurse", "City Hospital", "789 Health Blvd", "www.cityhospital.org", 2, 3);
+
+        insertContact("Sarah Williams", "+2222222233", "sarah.williams@pharmalink.com", "Pharmacist", "PharmaLink", "654 Pharmacy Street", "www.pharmalink.com", 2, 4);
+        insertContact("David Miller", "+2222222234", "david.miller@pharmalink.com", "Pharmacist", "PharmaLink", "654 Pharmacy Street", "www.pharmalink.com", 2, 4);
+
+        // Education
+        insertContact("Olivia Davis", "+3333333331", "olivia.davis@greenschool.edu", "Teacher", "Green School", "123 Education Road", "www.greenschool.edu", 3, 5);
+        insertContact("James Wilson", "+3333333332", "james.wilson@greenschool.edu", "Teacher", "Green School", "123 Education Road", "www.greenschool.edu", 3, 5);
+
+        insertContact("Sophia Martinez", "+3333333343", "sophia.martinez@university.edu", "Lecturer", "University of Knowledge", "321 Academic Blvd", "www.university.edu", 3, 6);
+        insertContact("Daniel Anderson", "+3333333344", "daniel.anderson@university.edu", "Lecturer", "University of Knowledge", "321 Academic Blvd", "www.university.edu", 3, 6);
+
+        // Finance
+        insertContact("Emma Thomas", "+4444444441", "emma.thomas@accountpros.com", "Accountant", "AccountPros", "789 Finance Street", "www.accountpros.com", 4, 7);
+        insertContact("Benjamin Lee", "+4444444442", "benjamin.lee@accountpros.com", "Accountant", "AccountPros", "789 Finance Street", "www.accountpros.com", 4, 7);
+
+        insertContact("Ava Harris", "+4444444453", "ava.harris@bankinvest.com", "Investment Banker", "BankInvest", "159 Wall Street", "www.bankinvest.com", 4, 8);
+        insertContact("Ethan Clark", "+4444444454", "ethan.clark@bankinvest.com", "Investment Banker", "BankInvest", "159 Wall Street", "www.bankinvest.com", 4, 8);
+
+        // Construction
+        insertContact("Mia Lewis", "+5555555551", "mia.lewis@buildcorp.com", "Civil Engineer", "BuildCorp", "951 Build Ave", "www.buildcorp.com", 5, 9);
+        insertContact("Logan Young", "+5555555552", "logan.young@buildcorp.com", "Civil Engineer", "BuildCorp", "951 Build Ave", "www.buildcorp.com", 5, 9);
+
+        insertContact("Isabella Walker", "+5555555563", "isabella.walker@archidesign.com", "Architect", "ArchiDesign", "654 Design Road", "www.archidesign.com", 5, 10);
+        insertContact("Lucas Hall", "+5555555564", "lucas.hall@archidesign.com", "Architect", "ArchiDesign", "654 Design Road", "www.archidesign.com", 5, 10);
+    }
 }

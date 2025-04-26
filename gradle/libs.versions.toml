@@ -1,5 +1,6 @@
 [versions]
 agp = "8.6.1"
+appintro = "6.3.1"
 desugar_jdk_libs = "2.1.5"
 entityExtraction = "16.0.0-beta6"
 flexbox = "3.0.0"
@@ -18,6 +19,7 @@ playServicesMlkitTextRecognitionCommon = "19.1.0"
 playServicesMlkitTextRecognition = "19.0.1"
 
 [libraries]
+appintro = { group = "com.github.AppIntro", name = "AppIntro", version.ref = "appintro" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 entity-extraction = { module = "com.google.mlkit:entity-extraction", version.ref = "entityExtraction" }
 flexbox = { group = "com.google.android.flexbox", name = "flexbox", version.ref = "flexbox" }

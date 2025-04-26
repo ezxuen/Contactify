@@ -43,10 +43,8 @@ public class ContactListActivity extends AppCompatActivity {
             return;
         }
 
-        // Set toolbar title dynamically
         getSupportActionBar().setTitle(fieldName);
 
-        // Recycler setup
         recyclerView = findViewById(R.id.contactRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         dbHelper = new DatabaseHelper(this);
@@ -63,7 +61,6 @@ public class ContactListActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    // Handle back button
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
