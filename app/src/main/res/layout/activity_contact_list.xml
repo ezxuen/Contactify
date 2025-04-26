@@ -13,8 +13,7 @@
         android:background="@android:color/white"
         android:titleTextColor="@android:color/black"
         android:theme="@style/ThemeOverlay.AppCompat.Light"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:navigationIcon="@drawable/common_google_signin_btn_icon_dark" />
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     <!-- Contact List -->
     <androidx.recyclerview.widget.RecyclerView

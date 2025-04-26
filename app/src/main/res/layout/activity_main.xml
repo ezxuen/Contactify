@@ -43,11 +43,23 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Industries"
-                android:textSize="24sp"
+                android:textSize="34sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/black" />
-        </LinearLayout>
 
+        </LinearLayout>
+        <TextView
+            android:id="@+id/emptyMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="\n\n\n\n\n\n\nNo contacts found. \n Please add contacts."
+            android:visibility="gone"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginTop="24dp"/>
         <!-- RecyclerView list -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/categoryRecyclerView"
@@ -58,6 +70,7 @@
             android:scrollbars="vertical"
             tools:listitem="@layout/item_category_card" />
     </LinearLayout>
+
 
     <!-- Floating Action Button -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton

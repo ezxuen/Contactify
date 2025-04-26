@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView headerText;
     private ImageView backArrow;
     private Uri imageUri;
+    private TextView emptyMessage;
 
     private enum Level { INDUSTRY, FIELD, CONTACT }
     private Level currentLevel = Level.INDUSTRY;
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        emptyMessage = findViewById(R.id.emptyMessage);
         dbHelper = new DatabaseHelper(this);
         fabMain = findViewById(R.id.fabMain);
         categoryRecyclerView = findViewById(R.id.categoryRecyclerView);
@@ -164,10 +165,17 @@ public class MainActivity extends AppCompatActivity {
         backArrow.setVisibility(View.GONE);
 
         ArrayList<String> industries = dbHelper.getIndustriesWithContacts();
-        categoryRecyclerView.setAdapter(new IndustryAdapter(industries, industry -> {
-            selectedIndustry = industry;
-            loadFields(industry);
-        }));
+        if (industries.isEmpty()) {
+            emptyMessage.setVisibility(View.VISIBLE);
+            categoryRecyclerView.setVisibility(View.GONE);
+        } else {
+            emptyMessage.setVisibility(View.GONE);
+            categoryRecyclerView.setVisibility(View.VISIBLE);
+            categoryRecyclerView.setAdapter(new IndustryAdapter(industries, industry -> {
+                selectedIndustry = industry;
+                loadFields(industry);
+            }));
+        }
     }
 
     private void loadFields(String industry) {

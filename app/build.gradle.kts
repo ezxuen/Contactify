@@ -44,11 +44,12 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
-    implementation("com.google.mlkit:text-recognition:16.0.0") // for OCR
-    implementation("com.google.mlkit:entity-extraction:16.0.0-beta5") // for OCR
-    implementation("org.apache.poi:poi:5.2.3")
-    implementation("org.apache.poi:poi-ooxml:5.2.3")
-    implementation("com.google.android.material:material:1.11.0")
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+    implementation(libs.text.recognition)
+    implementation(libs.entity.extraction) 
+    implementation(libs.poi)
+    implementation(libs.poi.ooxml)
+    implementation(libs.material.v1110)
+    implementation(libs.flexbox)
 
 }

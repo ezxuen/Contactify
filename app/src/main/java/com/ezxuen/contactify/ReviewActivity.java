@@ -2,9 +2,12 @@ package com.ezxuen.contactify;
 
 import android.app.AlertDialog;
 import android.content.ClipData;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
@@ -18,10 +21,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.helper.widget.Flow;
 
 import com.ezxuen.contactify.utils.DatabaseHelper;
+import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.chip.Chip;
 import com.google.mlkit.nl.entityextraction.*;
 
@@ -51,15 +55,15 @@ public class ReviewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_review);
         initViews();
         loadIndustryAndFieldData();
-
+        monitorRequiredFields();
         editingContactId = getIntent().getIntExtra("contact_id", -1);
 
         if (editingContactId != -1) {
+            setFieldsEditable(false);
             loadContactData(editingContactId);
             btnEdit.setVisibility(View.VISIBLE);
             btnSave.setVisibility(View.GONE);
             btnDelete.setVisibility(View.VISIBLE);
-            setFieldsEditable(false);
         } else {
             String ocrResult = getIntent().getStringExtra("ocr_result");
             Log.d("ReviewActivity", "OCR result: " + ocrResult);
@@ -67,6 +71,7 @@ public class ReviewActivity extends AppCompatActivity {
             if (ocrResult != null && !ocrResult.isEmpty()) {
                 parseAndDisplayFields(ocrResult);
             }
+            validateSaveButton();
 
             btnEdit.setVisibility(View.GONE);
             btnSave.setVisibility(View.VISIBLE);
@@ -89,6 +94,10 @@ public class ReviewActivity extends AppCompatActivity {
                     .setPositiveButton("Yes", (dialog, which) -> {
                         new DatabaseHelper(this).deleteContact(editingContactId);
                         Toast.makeText(this, "Contact deleted", Toast.LENGTH_SHORT).show();
+
+                        Intent intent = new Intent(this, MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
                         finish();
                     })
                     .setNegativeButton("Cancel", null)
@@ -111,6 +120,16 @@ public class ReviewActivity extends AppCompatActivity {
         btnEdit = findViewById(R.id.btnEdit);
         btnSave = findViewById(R.id.btnSave);
         btnDelete = findViewById(R.id.btnDelete);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("View Contact");
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            toolbar.setTitleTextAppearance(this, R.style.ToolbarTitleBold);
+        }
+
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         View.OnFocusChangeListener focusListener = (v, hasFocus) -> {
             if (hasFocus && v instanceof EditText) {
@@ -128,7 +147,6 @@ public class ReviewActivity extends AppCompatActivity {
                 if (draggedView instanceof Chip) {
                     ((ViewGroup) draggedView.getParent()).removeView(draggedView);
                     chipIds.remove((Integer) draggedView.getId());
-                    updateFlowReferencedIds();
                 }
             }
             return true;
@@ -156,77 +174,137 @@ public class ReviewActivity extends AppCompatActivity {
         industryDropdown.setSelection(0);
 
         industryDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 if (pos == 0) {
+                    // If user selects "Select Industry", disable fieldDropdown
                     fieldDropdown.setAdapter(null);
                     fieldDropdown.setEnabled(false);
-                    return;
+                } else {
+                    String industry = parent.getItemAtPosition(pos).toString();
+                    Integer industryId = industryNameToId.get(industry);
+                    if (industryId == null) return;
+
+                    ArrayList<String> fields = new ArrayList<>(fieldsByIndustry.get(industryId));
+                    fields.add(0, "Select Field");
+
+                    ArrayAdapter<String> fieldAdapter = new ArrayAdapter<>(ReviewActivity.this, R.layout.spinner_item_placeholder, fields);
+                    fieldAdapter.setDropDownViewResource(R.layout.spinner_item_placeholder);
+                    fieldDropdown.setAdapter(fieldAdapter);
+                    fieldDropdown.setSelection(0);
+                    fieldDropdown.setEnabled(true);
                 }
-
-                String industry = parent.getItemAtPosition(pos).toString();
-                Integer industryId = industryNameToId.get(industry);
-                if (industryId == null) return;
-
-                ArrayList<String> fields = new ArrayList<>(fieldsByIndustry.get(industryId));
-                fields.add(0, "Select Field");
-
-                fieldDropdown.setEnabled(editJobTitle.isEnabled());
-                ArrayAdapter<String> fieldAdapter = new ArrayAdapter<>(ReviewActivity.this, R.layout.spinner_item_placeholder, fields);
-                fieldAdapter.setDropDownViewResource(R.layout.spinner_item_placeholder);
-                fieldDropdown.setAdapter(fieldAdapter);
-                fieldDropdown.setSelection(0);
+                validateSaveButton(); // ✅ Always validate after changing industry
             }
 
-            @Override public void onNothingSelected(AdapterView<?> parent) {}
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                validateSaveButton();
+            }
+        });
+
+        fieldDropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                validateSaveButton(); // ✅ Always validate after changing field
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                validateSaveButton();
+            }
         });
     }
 
+
+
+
+
     private void parseAndDisplayFields(String rawText) {
-        EntityExtractor extractor = EntityExtraction.getClient(new EntityExtractorOptions.Builder(EntityExtractorOptions.ENGLISH).build());
-        editEmails.setText(""); editPhones.setText(""); editAddress.setText("");
-        ArrayList<String> usedLines = new ArrayList<>();
+        EntityExtractor extractor = EntityExtraction.getClient(
+                new EntityExtractorOptions.Builder(EntityExtractorOptions.ENGLISH).build()
+        );
+
+        // Clear fields
+        editEmails.setText("");
+        editPhones.setText("");
+        editAddress.setText("");
         unclassifiedData.clear();
+        chipIds.clear();
+
+        // Clean the OCR input
+        String cleanedText = rawText.replace("\n", " ").replaceAll("\\s+", " ").trim();
+        ArrayList<String> usedEntities = new ArrayList<>();
 
         extractor.downloadModelIfNeeded().addOnSuccessListener(unused -> {
-            EntityExtractionParams params = new EntityExtractionParams.Builder(rawText).build();
+            EntityExtractionParams params = new EntityExtractionParams.Builder(cleanedText).build();
             extractor.annotate(params).addOnSuccessListener(annotations -> {
                 for (EntityAnnotation annotation : annotations) {
-                    String line = annotation.getAnnotatedText().trim();
-                    if (usedLines.contains(line)) continue;
+                    String text = annotation.getAnnotatedText().trim();
+                    if (usedEntities.contains(text)) continue;
 
                     for (Entity entity : annotation.getEntities()) {
                         switch (entity.getType()) {
-                            case Entity.TYPE_EMAIL: appendToEditText(editEmails, line); usedLines.add(line); break;
-                            case Entity.TYPE_PHONE: if (isValidPhone(line) && !looksLikeAddress(line)) {
-                                appendToEditText(editPhones, line); usedLines.add(line); }
+                            case Entity.TYPE_EMAIL:
+                                appendToEditText(editEmails, text);
+                                usedEntities.add(text);
                                 break;
-                            case Entity.TYPE_ADDRESS: appendToEditText(editAddress, line); usedLines.add(line); break;
+                            case Entity.TYPE_PHONE:
+                                if (isValidPhone(text) && !looksLikeAddress(text)) {
+                                    appendToEditText(editPhones, text);
+                                    usedEntities.add(text);
+                                }
+                                break;
+                            case Entity.TYPE_ADDRESS:
+                                appendToEditText(editAddress, text);
+                                usedEntities.add(text);
+                                break;
                         }
                     }
                 }
 
-                for (String line : rawText.split("\n")) {
-                    String trimmed = line.trim();
-                    if (!trimmed.isEmpty() && !usedLines.contains(trimmed)) {
-                        unclassifiedData.add(trimmed);
-                    }
-                }
-
-                ViewGroup chipHolder = findViewById(R.id.chipContainer);
-                chipHolder.removeAllViews();
-                chipIds.clear();
-
-                if (!unclassifiedData.isEmpty()) {
-                    unclassifiedLabel.setVisibility(View.VISIBLE);
-                    unclassifiedContainer.setVisibility(View.VISIBLE);
-                    for (String item : unclassifiedData) addChip(item);
-                    setFieldsEditable(true);
-                } else {
-                    btnEdit.setVisibility(View.VISIBLE);
-                    setFieldsEditable(false);
-                }
+                populateUnclassifiedChips(rawText, usedEntities);
+            }).addOnFailureListener(e -> {
+                Log.e("EntityExtraction", "Annotation failed: " + e.getMessage());
+                populateUnclassifiedChips(rawText, usedEntities); // fallback
             });
+        }).addOnFailureListener(e -> {
+            Log.e("EntityExtraction", "Model download failed: " + e.getMessage());
+            populateUnclassifiedChips(rawText, usedEntities); // fallback
         });
+    }
+    private abstract static class TextWatcherAdapter implements android.text.TextWatcher {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {}
+    }
+
+    private void monitorRequiredFields() {
+        TextWatcher watcher = new ReviewActivity.TextWatcherAdapter() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                validateSaveButton();
+            }
+        };
+
+        editName.addTextChangedListener(watcher);
+        editJobTitle.addTextChangedListener(watcher);
+    }
+    private void validateSaveButton() {
+        boolean nameFilled = !TextUtils.isEmpty(editName.getText().toString().trim());
+        boolean jobFilled = !TextUtils.isEmpty(editJobTitle.getText().toString().trim());
+
+        String selectedIndustry = industryDropdown.getSelectedItem() != null ? industryDropdown.getSelectedItem().toString() : "";
+        String selectedField = fieldDropdown.getSelectedItem() != null ? fieldDropdown.getSelectedItem().toString() : "";
+
+        boolean industrySelected = !selectedIndustry.equals("Select Industry");
+        boolean fieldSelected = fieldDropdown.isEnabled() && !selectedField.equals("Select Field");
+
+        boolean enable = nameFilled && jobFilled && industrySelected && fieldSelected;
+        btnSave.setEnabled(enable);
+        btnSave.setAlpha(enable ? 1.0f : 0.5f);
     }
 
     private boolean isValidPhone(String value) {
@@ -245,6 +323,31 @@ public class ReviewActivity extends AppCompatActivity {
         editText.setText(current + value);
     }
 
+    private void populateUnclassifiedChips(String rawText, ArrayList<String> usedEntities) {
+        FlexboxLayout chipHolder = findViewById(R.id.chipContainer);
+        chipHolder.removeAllViews();
+
+        unclassifiedData.clear();
+
+        for (String line : rawText.split("\n")) {
+            String trimmed = line.trim();
+            if (!trimmed.isEmpty() && !usedEntities.contains(trimmed)) {
+                unclassifiedData.add(trimmed);
+            }
+        }
+
+        if (!unclassifiedData.isEmpty()) {
+            unclassifiedLabel.setVisibility(View.VISIBLE);
+            unclassifiedContainer.setVisibility(View.VISIBLE);
+            for (String item : unclassifiedData) {
+                addChip(item);
+            }
+        } else {
+            btnEdit.setVisibility(View.VISIBLE);
+            setFieldsEditable(false);
+        }
+    }
+
 
     private void addChip(String text) {
         Chip chip = new Chip(this);
@@ -253,64 +356,47 @@ public class ReviewActivity extends AppCompatActivity {
         chip.setCheckable(false);
         chip.setId(View.generateViewId());
 
-        // ✅ Set background and text color
         chip.setChipBackgroundColorResource(android.R.color.white);
         chip.setTextColor(getResources().getColor(android.R.color.black));
 
-
-        // ✅ Drag and drop behavior
-        chip.setOnLongClickListener(v -> {
+        // ✅ Drag immediately when touching
+        chip.setOnTouchListener((v, event) -> {
             ClipData data = ClipData.newPlainText("label", chip.getText());
             View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(chip);
             v.startDragAndDrop(data, shadowBuilder, chip, 0);
-            return true;
+            return false;
         });
 
-        // ✅ Assign chip text to selected field on click
         chip.setOnClickListener(v -> {
             if (selectedTargetField != null) {
                 appendToEditText(selectedTargetField, text);
                 ((ViewGroup) chip.getParent()).removeView(chip);
                 chipIds.remove((Integer) chip.getId());
-                updateFlowReferencedIds();
             }
         });
 
-        // ✅ Add chip to container and update flow
-        ViewGroup chipHolder = findViewById(R.id.chipContainer);
-        chipHolder.setVisibility(View.VISIBLE);
+        FlexboxLayout chipHolder = findViewById(R.id.chipContainer);
         chipHolder.addView(chip);
         chipIds.add(chip.getId());
-        updateFlowReferencedIds();
     }
-    private void updateFlowReferencedIds() {
-        Flow flow = findViewById(R.id.unclassifiedFlow);
-        ViewGroup chipHolder = findViewById(R.id.chipContainer);
-
-        if (flow != null && chipHolder != null) {
-            int count = chipHolder.getChildCount();
-            int[] ids = new int[count];
-            for (int i = 0; i < count; i++) {
-                ids[i] = chipHolder.getChildAt(i).getId();
-            }
-            flow.setReferencedIds(ids);
-        } else {
-            Log.e("ReviewActivity", "Flow or chipHolder is null!");
-        }
-    }
-
 
     private void setFieldsEditable(boolean editable) {
-        editName.setEnabled(editable);
-        editPhones.setEnabled(editable);
-        editEmails.setEnabled(editable);
-        editJobTitle.setEnabled(editable);
-        editCompany.setEnabled(editable);
-        editAddress.setEnabled(editable);
-        editWebsite.setEnabled(editable);
-        industryDropdown.setEnabled(editable);
-        fieldDropdown.setEnabled(editable);
+        float alpha = editable ? 1.0f : 0.5f;
+
+        for (EditText field : new EditText[]{editName, editPhones, editEmails, editJobTitle, editCompany, editAddress, editWebsite}) {
+            field.setEnabled(editable);
+            field.setAlpha(alpha);
+        }
+        for (Spinner spinner : new Spinner[]{industryDropdown, fieldDropdown}) {
+            spinner.setEnabled(editable);
+            if (editable) {
+                spinner.setBackgroundColor(getResources().getColor(android.R.color.white));
+            } else {
+                spinner.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+            }
+         }
     }
+
 
     private void saveContact() {
         String name = editName.getText().toString().trim();
@@ -356,6 +442,9 @@ public class ReviewActivity extends AppCompatActivity {
             Toast.makeText(this, "Contact saved!", Toast.LENGTH_SHORT).show();
         }
 
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
         finish();
     }
 
@@ -393,9 +482,16 @@ public class ReviewActivity extends AppCompatActivity {
                             if (index >= 0) fieldDropdown.setSelection(index);
                         }
                     }
+                    setFieldsEditable(false);
                 }, 100);
             });
         }
         if (cursor != null) cursor.close();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 }
