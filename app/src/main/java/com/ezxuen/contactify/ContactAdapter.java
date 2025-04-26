@@ -1,5 +1,6 @@
 package com.ezxuen.contactify;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,7 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.ContactV
     static class ContactViewHolder extends RecyclerView.ViewHolder {
         TextView contactInfo;
 
+        @SuppressLint("WrongViewCast")
         ContactViewHolder(View itemView) {
             super(itemView);
             contactInfo = itemView.findViewById(R.id.contactInfoText);

@@ -51,10 +51,10 @@ public class ExcelLoader {
             workbook.close();
             inputStream.close();
 
-            Log.d("ExcelLoader", "✅ Data loaded successfully.");
+            Log.d("ExcelLoader", "Data loaded successfully.");
 
         } catch (Exception e) {
-            Log.e("ExcelLoader", "❌ Failed to load Excel data", e);
+            Log.e("ExcelLoader", "Failed to load Excel data", e);
         }
     }
 }
